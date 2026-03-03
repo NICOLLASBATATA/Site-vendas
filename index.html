@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ateliê Gleyci Souza | Elegância em Cada Detalhe</title>
+    <meta name="description"
+        content="Papelaria de luxo, encadernação artesanal e cartonagem personalizada. Peças exclusivas feitas à mão.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body data-theme="nature">
+    <header id="header">
+        <div class="container nav-container">
+            <a href="#" class="logo">Ateliê Gleyci Souza</a>
+
+            <div class="nav-right">
+                <nav class="nav-links">
+                    <a href="#home">Início</a>
+                    <a href="#top10">Mais Pedidos</a>
+                    <a href="#produtos">Coleções</a>
+                    <a href="#sobre">Sobre a Gleyci</a>
+                </nav>
+
+                <button id="theme-toggle" class="icon-btn" title="Mudar Tema">
+                    <i class="fas fa-palette"></i>
+                </button>
+
+                <button id="cart-toggle" class="icon-btn" title="Carrinho">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span id="cart-count" class="cart-badge">0</span>
+                </button>
+
+                <a href="login.html" class="icon-btn" title="Adicionar Produtos">
+                    <i class="fas fa-plus-circle"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero fade-in">
+            <div class="hero-content">
+                <h1>Feito à mão, com todo o carinho para você.</h1>
+                <p>Aqui no ateliê, transformamos papel e tecido em caixas, álbuns e embalagens que guardam as suas
+                    melhores memórias.</p>
+                <div class="hero-btns">
+                    <a href="#produtos" class="btn btn-primary">Conheça Meus Trabalhos</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="top10" class="products" style="background-color: var(--surface);">
+            <div class="container">
+                <div class="section-header">
+                    <h2>⭐ Top 10 Mais Pedidos</h2>
+                    <p>Os queridinhos dos nossos clientes. As peças mais amadas e procuradas do ateliê.</p>
+                </div>
+                <!-- Usaremos um flex container com scroll horizontal para os destaques -->
+                <div id="top10-grid" class="product-grid"
+                    style="display: flex; overflow-x: auto; padding-bottom: 20px; scroll-snap-type: x mandatory; gap: 30px;">
+                    <!-- Dynamic Top 10 Products -->
+                </div>
+            </div>
+        </section>
+
+        <section id="produtos" class="products">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Minhas Coleções</h2>
+                    <p>Cada peça é única, pensada e produzida de forma totalmente artesanal feita à mão.</p>
+                </div>
+                <div id="product-grid" class="product-grid">
+                    <!-- Dynamic Products -->
+                </div>
+            </div>
+        </section>
+
+        <section id="sobre" class="about">
+            <div class="container about-container">
+                <div class="about-image">
+                    <img src="IMG_20260121_184040.jpg" alt="Gleyci Souza">
+                </div>
+                <div class="about-text">
+                    <h2>Oi! Eu sou a Gleyci.</h2>
+                    <p>Meu trabalho é transformar sentimentos em histórias físicas através da encadernação artesanal e
+                        da cartonagem de luxo.</p>
+                    <p>Para mim, não se trata apenas de produtos, mas de criar o lugar perfeito para guardar as suas
+                        memórias mais felizes. Eu uso os melhores materiais possíveis e dou atenção a todos os detalhes
+                        para garantir que você tenha um item único no mundo.</p>
+                    <p>Seja um planner para organizar a sua rotina incrível ou um álbum lindo para recordar momentos,
+                        faço tudo com amor no meu ateliê.</p>
+                    <div style="margin-top: 40px;">
+                        <a href="https://www.instagram.com/atelie.gleycisouza/" target="_blank"
+                            class="btn btn-outline">Vem dar um oi no Instagram!</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Shopping Cart Drawer -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+    <div id="cart-drawer" class="cart-drawer">
+        <div class="cart-header">
+            <h3>Seu Carrinho</h3>
+            <button id="close-cart" class="icon-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <!-- Cart items will appear here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total-value">R$ 0,00</span>
+            </div>
+            <button id="checkout-btn" class="btn btn-primary" style="width: 100%;">Finalizar pelo WhatsApp</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h2 class="footer-logo">Ateliê Gleyci Souza</h2>
+                    <p>Produzindo emoções através da cartonagem e papelaria de luxo.</p>
+                </div>
+                <div>
+                    <h3>Links</h3>
+                    <ul style="list-style: none; margin-top: 20px;">
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#produtos">Produtos</a></li>
+                        <li><a href="#sobre">Sobre</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Contato</h3>
+                    <ul style="list-style: none; margin-top: 20px;">
+                        <li><a href="https://wa.me/5585991871158"><i class="fab fa-whatsapp"></i> (85) 99187-1158</a>
+                        </li>
+                        <li><a href="https://www.instagram.com/atelie.gleycisouza/"><i class="fab fa-instagram"></i>
+                                Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 80px; opacity: 0.5; font-size: 0.8rem;">
+                <p>&copy; 2026 Ateliê Gleyci Souza. Site Feito por Nicollas.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+
+</html>

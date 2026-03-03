@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Restrito | Ateliê Gleyci Souza</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--bg);
+        }
+
+        .auth-card {
+            background: var(--surface);
+            padding: 50px 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-premium);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .error-msg,
+        .success-msg {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-msg {
+            color: #ff4757;
+        }
+
+        .success-msg {
+            color: #2ed573;
+        }
+
+        .auth-toggle {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth-toggle a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body data-theme="nature">
+    <div class="auth-section">
+        <div class="auth-card fade-in">
+            <h2 id="form-title">Login</h2>
+            <form id="auth-form">
+                <div class="form-group" id="name-group" style="display: none;">
+                    <label>Nome</label>
+                    <input type="text" id="name" placeholder="Seu nome">
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="email" required placeholder="gleyci@exemplo.com">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="password" required placeholder="Sua senha">
+                </div>
+                <p id="error-msg" class="error-msg">Dados inválidos.</p>
+                <p id="success-msg" class="success-msg">Cadastro realizado! Faça login agora.</p>
+
+                <button type="submit" id="submit-btn" class="btn btn-primary"
+                    style="width: 100%; margin-top: 10px;">Entrar</button>
+
+                <div class="auth-toggle">
+                    <span id="toggle-text">Não tem uma conta?</span> <a id="toggle-link">Cadastre-se</a>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <a href="index.html"
+                        style="font-size: 0.85rem; color: var(--text-muted); text-decoration: underline;">Voltar para o
+                        site</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true;
+        const formTitle = document.getElementById('form-title');
+        const nameGroup = document.getElementById('name-group');
+        const nameInput = document.getElementById('name');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleText = document.getElementById('toggle-text');
+        const toggleLink = document.getElementById('toggle-link');
+        const errorMsg = document.getElementById('error-msg');
+        const successMsg = document.getElementById('success-msg');
+
+        // Inicializa admin padrão para testes caso não exista base
+        let users = JSON.parse(localStorage.getItem('atelie_users')) || [];
+        if (users.length === 0) {
+            users.push({ nome: 'Admin', email: 'admin@atelie.com', password: '123' });
+            localStorage.setItem('atelie_users', JSON.stringify(users));
+        }
+
+        toggleLink.addEventListener('click', () => {
+            isLogin = !isLogin;
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (isLogin) {
+                formTitle.innerText = 'Login';
+                nameGroup.style.display = 'none';
+                nameInput.removeAttribute('required');
+                submitBtn.innerText = 'Entrar';
+                toggleText.innerText = 'Não tem uma conta?';
+                toggleLink.innerText = 'Cadastre-se';
+            } else {
+                formTitle.innerText = 'Cadastro';
+                nameGroup.style.display = 'block';
+                nameInput.setAttribute('required', 'true');
+                submitBtn.innerText = 'Criar Conta';
+                toggleText.innerText = 'Já possui conta?';
+                toggleLink.innerText = 'Fazer Login';
+            }
+        });
+
+        document.getElementById('auth-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            let users = JSON.parse(localStorage.getItem('atelie_users')) || [];
+
+            if (isLogin) {
+                // Fluxo de Login
+                const user = users.find(u => u.email === email && u.password === password);
+                if (user) {
+                    sessionStorage.setItem('atelie_logged_in', 'true');
+                    sessionStorage.setItem('atelie_current_user', user.nome);
+                    window.location.href = 'admin.html';
+                } else {
+                    errorMsg.innerText = 'E-mail ou senha incorretos.';
+                    errorMsg.style.display = 'block';
+                }
+            } else {
+                // Fluxo de Cadastro
+                const existingUser = users.find(u => u.email === email);
+                if (existingUser) {
+                    errorMsg.innerText = 'Este e-mail já está cadastrado.';
+                    errorMsg.style.display = 'block';
+                } else {
+                    const name = document.getElementById('name').value.trim();
+                    users.push({ nome: name, email: email, password: password });
+                    localStorage.setItem('atelie_users', JSON.stringify(users));
+
+                    successMsg.style.display = 'block';
+                    document.getElementById('auth-form').reset();
+
+                    // Voltar para aba de login
+                    setTimeout(() => {
+                        toggleLink.click();
+                        successMsg.style.display = 'block'; // Manter a mensagem visível após a troca
+                    }, 500);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
