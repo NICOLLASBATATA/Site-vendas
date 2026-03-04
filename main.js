@@ -5,14 +5,52 @@ const PRODUCTS_KEY = 'atelie_products';
 // --- Auth Management ---
 function logout() {
     sessionStorage.removeItem('atelie_logged_in');
-    window.location.href = 'index.html';
+    sessionStorage.removeItem('atelie_current_user');
+    sessionStorage.removeItem('atelie_current_user_photo');
+    window.location.href = 'login.html';
 }
 window.logout = logout;
 
 // --- Product Management ---
 function getProducts() {
-    const products = localStorage.getItem(PRODUCTS_KEY);
-    return products ? JSON.parse(products) : [];
+    const productsStr = localStorage.getItem(PRODUCTS_KEY);
+    if (!productsStr || productsStr === '[]') {
+        const defaultProducts = [
+            {
+                id: 1,
+                name: "Agenda Personalizada Luxo",
+                price: "180,00",
+                description: "Agenda feita à mão com detalhes em dourado.",
+                image: "https://picsum.photos/600/600?notebook",
+                isTop10: true
+            },
+            {
+                id: 2,
+                name: "Álbum de Casamento",
+                price: "250,00",
+                description: "Guarde as memórias do seu dia especial com elegância.",
+                image: "https://picsum.photos/600/600?wedding",
+                isTop10: true
+            },
+            {
+                id: 3,
+                name: "Caixa Cartonada Premium",
+                price: "90,00",
+                description: "Embalagem sofisticada para presentes inesquecíveis.",
+                image: "https://picsum.photos/600/600?box",
+                isTop10: false
+            }
+        ];
+        // Only set default once to avoid overwriting if user intentionally deleted everything
+        // Using a secondary key to track if we already seeded
+         if(localStorage.getItem('atelie_seeded')) {
+            localStorage.setItem(PRODUCTS_KEY, JSON.stringify(defaultProducts));
+            localStorage.setItem('atelie_seeded', 'true');
+            return defaultProducts;
+        }
+        return [];
+    }
+    return JSON.parse(productsStr);
 }
 
 function saveProducts(products) {
@@ -33,6 +71,7 @@ function addToCart(productId) {
     if (product) {
         cart.push({ ...product, cartId: Date.now() });
         saveCart();
+        triggerCartPulse();
         openCart();
     }
 }
@@ -156,6 +195,145 @@ function initThemes() {
     });
 }
 
+// --- User Profile (avatar + nome logado) ---
+function initUserProfile() {
+    const profileContainer = document.getElementById('user-profile');
+    if (!profileContainer) return;
+
+    const isLogged = sessionStorage.getItem('atelie_logged_in') === 'true';
+
+    if (!isLogged) {
+        profileContainer.style.display = 'none';
+        profileContainer.innerHTML = '';
+        return;
+    }
+
+    const name = sessionStorage.getItem('atelie_current_user') || 'Visitante';
+    const photo = sessionStorage.getItem('atelie_current_user_photo');
+
+    profileContainer.style.display = 'flex';
+    profileContainer.innerHTML = `
+        <div class="user-profile-inner">
+            ${photo
+                ? `<img src="${photo}" alt="${name}">`
+                : `<div class="user-avatar-placeholder"><i class="fas fa-user"></i></div>`}
+            <span class="user-profile-name">${name}</span>
+        </div>
+    `;
+
+    profileContainer.style.cursor = 'pointer';
+    profileContainer.onclick = () => {
+        openAccountModal();
+    };
+}
+
+// Modal de conta / perfil
+function openAccountModal() {
+    const modal = document.getElementById('account-modal');
+    if (!modal) return;
+
+    const isLogged = sessionStorage.getItem('atelie_logged_in') === 'true';
+    const email = sessionStorage.getItem('atelie_current_email') || '';
+
+    if (!isLogged || !email) {
+        logout();
+        return;
+    }
+
+    const normalizedEmail = email.toLowerCase();
+    const nameInput = document.getElementById('account-name');
+    const emailLabel = document.getElementById('account-email-label');
+    const photoPreview = document.getElementById('account-photo-preview');
+    const photoFileInput = document.getElementById('account-photo-file');
+
+    let users = JSON.parse(localStorage.getItem('atelie_users')) || [];
+    const user = users.find(u => (u.email || '').toLowerCase() === normalizedEmail) || {};
+
+    if (nameInput) nameInput.value = user.nome || sessionStorage.getItem('atelie_current_user') || '';
+    if (emailLabel) emailLabel.textContent = normalizedEmail;
+    if (photoFileInput) photoFileInput.value = '';
+
+    const photo = user.photo || sessionStorage.getItem('atelie_current_user_photo') || '';
+    if (photoPreview) {
+        if (photo) {
+            photoPreview.src = photo;
+            photoPreview.style.display = 'block';
+        } else {
+            photoPreview.removeAttribute('src');
+            photoPreview.style.display = 'none';
+        }
+    }
+
+    modal.classList.add('open');
+}
+
+function closeAccountModal() {
+    const modal = document.getElementById('account-modal');
+    if (!modal) return;
+    modal.classList.remove('open');
+}
+
+function handleAccountSave() {
+    const isLogged = sessionStorage.getItem('atelie_logged_in') === 'true';
+    const email = sessionStorage.getItem('atelie_current_email') || '';
+    if (!isLogged || !email) {
+        logout();
+        return;
+    }
+
+    const normalizedEmail = email.toLowerCase();
+    const nameInput = document.getElementById('account-name');
+    const photoFileInput = document.getElementById('account-photo-file');
+    const newName = nameInput ? nameInput.value.trim() : '';
+
+    let users = JSON.parse(localStorage.getItem('atelie_users')) || [];
+    let index = users.findIndex(u => (u.email || '').toLowerCase() === normalizedEmail);
+
+    if (index === -1) {
+        users.push({ nome: newName || 'Visitante', email: normalizedEmail, password: '', photo: null });
+        index = users.length - 1;
+    } else {
+        if (newName) {
+            users[index].nome = newName;
+        }
+    }
+
+    const finishSave = (maybePhoto) => {
+        if (maybePhoto) {
+            users[index].photo = maybePhoto;
+        }
+
+        localStorage.setItem('atelie_users', JSON.stringify(users));
+
+        // Atualiza sessão e cabeçalho
+        sessionStorage.setItem('atelie_current_user', users[index].nome || 'Visitante');
+        if (users[index].photo) {
+            sessionStorage.setItem('atelie_current_user_photo', users[index].photo);
+        }
+
+        initUserProfile();
+        alert('Dados da conta atualizados com sucesso!');
+        closeAccountModal();
+    };
+
+    const photoFile = photoFileInput && photoFileInput.files ? photoFileInput.files[0] : null;
+    if (photoFile) {
+        compressImage(photoFile, finishSave);
+    } else {
+        finishSave(null);
+    }
+}
+
+// Pequena animação no ícone do carrinho quando adiciona produto
+function triggerCartPulse() {
+    const cartToggle = document.getElementById('cart-toggle');
+    if (!cartToggle) return;
+    cartToggle.classList.remove('cart-pulse');
+    // força reflow para reiniciar a animação
+    void cartToggle.offsetWidth;
+    cartToggle.classList.add('cart-pulse');
+}
+
 // --- Checkout ---
 function checkout() {
     if (cart.length === 0) return;
@@ -207,8 +385,12 @@ function compressImage(file, callback) {
 
 // --- Admin Logic ---
 if (window.location.pathname.includes('admin.html')) {
-    // Auth Check
-    if (sessionStorage.getItem('atelie_logged_in') !== 'true') {
+    // Auth Check – apenas o e-mail autorizado pode acessar o painel
+    const REQUIRED_EMAIL = 'nenezinhomsouza@gmail.com';
+    const isLogged = sessionStorage.getItem('atelie_logged_in') === 'true';
+    const currentEmail = (sessionStorage.getItem('atelie_current_email') || '').toLowerCase();
+
+    if (!isLogged || currentEmail !== REQUIRED_EMAIL) {
         window.location.href = 'login.html';
     }
 
@@ -348,6 +530,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize common components if they exist
     renderStorefront();
     initThemes();
+    initUserProfile();
+
+    // Modal de conta
+    (function initAccountModal() {
+        const modal = document.getElementById('account-modal');
+        if (!modal) return;
+
+        const backdrop = document.getElementById('account-modal-backdrop');
+        const closeBtn = document.getElementById('account-close-btn');
+        const saveBtn = document.getElementById('account-save-btn');
+        const unlinkBtn = document.getElementById('account-unlink-btn');
+
+        if (backdrop) backdrop.addEventListener('click', closeAccountModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeAccountModal);
+        if (saveBtn) saveBtn.addEventListener('click', handleAccountSave);
+        if (unlinkBtn) unlinkBtn.addEventListener('click', () => logout());
+    })();
     updateCartUI();
 
     // Scroll effect
