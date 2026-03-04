@@ -4,44 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acesso Restrito | Ateliê Gleyci Souza</title>
+    <title>Adicionar Produtos | Ateliê Gleyci Souza</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .auth-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .admin-section {
+            padding: 150px 0 100px;
             min-height: 100vh;
-            background: var(--bg);
         }
 
-        .auth-card {
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 60px;
+        }
+
+        .admin-form-card {
             background: var(--surface);
-            padding: 50px 40px;
+            padding: 40px;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-premium);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .auth-card h2 {
-            margin-bottom: 20px;
-            color: var(--primary);
+            height: fit-content;
+            position: sticky;
+            top: 120px;
         }
 
         .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+            margin-bottom: 25px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 0.9rem;
-            color: var(--text);
             font-weight: 600;
+            color: var(--primary);
         }
 
         .form-group input {
@@ -58,156 +55,120 @@
             border-color: var(--accent);
         }
 
-        .error-msg,
-        .success-msg {
-            font-size: 0.85rem;
-            margin-top: 10px;
-            display: none;
-        }
+        @media (max-width: 992px) {
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .error-msg {
-            color: #ff4757;
-        }
-
-        .success-msg {
-            color: #2ed573;
-        }
-
-        .auth-toggle {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-
-        .auth-toggle a {
-            color: var(--primary);
-            font-weight: 600;
-            text-decoration: underline;
-            cursor: pointer;
+            .admin-form-card {
+                position: static;
+            }
         }
     </style>
 </head>
 
 <body data-theme="nature">
-    <div class="auth-section">
-        <div class="auth-card fade-in">
-            <h2 id="form-title">Login</h2>
-            <form id="auth-form">
-                <div class="form-group" id="name-group" style="display: none;">
-                    <label>Nome</label>
-                    <input type="text" id="name" placeholder="Seu nome">
-                </div>
-                <div class="form-group">
-                    <label>E-mail</label>
-                    <input type="email" id="email" required placeholder="gleyci@exemplo.com">
-                </div>
-                <div class="form-group">
-                    <label>Senha</label>
-                    <input type="password" id="password" required placeholder="Sua senha">
-                </div>
-                <p id="error-msg" class="error-msg">Dados inválidos.</p>
-                <p id="success-msg" class="success-msg">Cadastro realizado! Faça login agora.</p>
+    <header id="header" class="scrolled">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">Ateliê Gleyci Souza</a>
+            <nav class="nav-links">
+                <span id="user-profile" class="user-profile"></span>
+                <a href="#" onclick="logout()">Sair do Painel</a>
+            </nav>
+        </div>
+    </header>
 
-                <button type="submit" id="submit-btn" class="btn btn-primary"
-                    style="width: 100%; margin-top: 10px;">Entrar</button>
-
-                <div class="auth-toggle">
-                    <span id="toggle-text">Não tem uma conta?</span> <a id="toggle-link">Cadastre-se</a>
+    <main class="admin-section">
+        <div class="container">
+            <div class="admin-grid">
+                <div class="admin-form-card">
+                    <h3 style="margin-bottom: 30px;">Novo Produto</h3>
+                    <form id="product-form">
+                        <div class="form-group">
+                            <label>Nome do Produto</label>
+                            <input type="text" id="name" required placeholder="Ex: Agenda Luxo 2024">
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição Curta / Para que serve?</label>
+                            <input type="text" id="description" required
+                                placeholder="Ex: Ideal para profissionais se organizarem...">
+                        </div>
+                        <div class="form-group">
+                            <label>Preço (R$)</label>
+                            <input type="text" id="price" required placeholder="Ex: 180,00">
+                        </div>
+                        <div class="form-group">
+                            <label>Foto do Produto</label>
+                            <input type="file" id="image-file" accept="image/*">
+                            <small style="color: var(--text-muted); font-size: 0.8rem;">Deixe vazio ao editar se quiser
+                                manter a foto atual.</small>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="is-top10" style="width: auto;">
+                            <label for="is-top10" style="margin-bottom: 0;">Destaque (Top 10 Mais Pedidos)</label>
+                        </div>
+                        <input type="hidden" id="editing-id" value="">
+                        <button type="submit" id="submit-action-btn" class="btn btn-primary" style="width: 100%;">Salvar
+                            Produto</button>
+                        <button type="button" id="cancel-edit-btn" class="btn btn-outline"
+                            style="width: 100%; margin-top: 10px; display: none;">Cancelar Edição</button>
+                    </form>
                 </div>
 
-                <div style="margin-top: 20px;">
-                    <a href="index.html"
-                        style="font-size: 0.85rem; color: var(--text-muted); text-decoration: underline;">Voltar para o
-                        site</a>
+                <div>
+                    <h3 style="margin-bottom: 40px;">Produtos Ativos</h3>
+                    <div id="admin-product-grid" class="product-grid"
+                        style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+                        <!-- Admin products -->
+                    </div>
                 </div>
-            </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Conta / Perfil (reutilizado no painel) -->
+    <div id="account-modal" class="account-modal">
+        <div id="account-modal-backdrop" class="account-modal-backdrop"></div>
+        <div class="account-modal-card fade-in">
+            <h3 style="margin-bottom: 10px;">Minha Conta</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px;">
+                Atualize seu nome e foto que aparecem aqui no site.
+            </p>
+            <div class="account-modal-body">
+                <div class="account-photo-wrapper">
+                    <img id="account-photo-preview" alt="Foto de perfil" />
+                </div>
+                <div class="account-form-fields">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="account-name" placeholder="Seu nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Nova foto de perfil</label>
+                        <input type="file" id="account-photo-file" accept="image/*">
+                        <small style="font-size: 0.8rem; color: var(--text-muted);">Se não escolher uma nova foto, a
+                            atual será mantida.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail conectado</label>
+                        <p id="account-email-label" class="account-email-label"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="account-modal-actions">
+                <button type="button" id="account-save-btn" class="btn btn-primary" style="width: 100%;">Salvar
+                    alterações</button>
+                <button type="button" id="account-unlink-btn" class="btn btn-outline"
+                    style="width: 100%; margin-top: 10px;">Desvincular conta</button>
+                <button type="button" id="account-close-btn" class="icon-btn"
+                    style="display: block; margin: 15px auto 0; font-size: 0.9rem; opacity: 0.7;">
+                    Fechar
+                </button>
+            </div>
         </div>
     </div>
 
-    <script>
-        let isLogin = true;
-        const formTitle = document.getElementById('form-title');
-        const nameGroup = document.getElementById('name-group');
-        const nameInput = document.getElementById('name');
-        const submitBtn = document.getElementById('submit-btn');
-        const toggleText = document.getElementById('toggle-text');
-        const toggleLink = document.getElementById('toggle-link');
-        const errorMsg = document.getElementById('error-msg');
-        const successMsg = document.getElementById('success-msg');
-
-        // Inicializa admin padrão para testes caso não exista base
-        let users = JSON.parse(localStorage.getItem('atelie_users')) || [];
-        if (users.length === 0) {
-            users.push({ nome: 'Admin', email: 'admin@atelie.com', password: '123' });
-            localStorage.setItem('atelie_users', JSON.stringify(users));
-        }
-
-        toggleLink.addEventListener('click', () => {
-            isLogin = !isLogin;
-            errorMsg.style.display = 'none';
-            successMsg.style.display = 'none';
-
-            if (isLogin) {
-                formTitle.innerText = 'Login';
-                nameGroup.style.display = 'none';
-                nameInput.removeAttribute('required');
-                submitBtn.innerText = 'Entrar';
-                toggleText.innerText = 'Não tem uma conta?';
-                toggleLink.innerText = 'Cadastre-se';
-            } else {
-                formTitle.innerText = 'Cadastro';
-                nameGroup.style.display = 'block';
-                nameInput.setAttribute('required', 'true');
-                submitBtn.innerText = 'Criar Conta';
-                toggleText.innerText = 'Já possui conta?';
-                toggleLink.innerText = 'Fazer Login';
-            }
-        });
-
-        document.getElementById('auth-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            errorMsg.style.display = 'none';
-            successMsg.style.display = 'none';
-
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-
-            let users = JSON.parse(localStorage.getItem('atelie_users')) || [];
-
-            if (isLogin) {
-                // Fluxo de Login
-                const user = users.find(u => u.email === email && u.password === password);
-                if (user) {
-                    sessionStorage.setItem('atelie_logged_in', 'true');
-                    sessionStorage.setItem('atelie_current_user', user.nome);
-                    window.location.href = 'admin.html';
-                } else {
-                    errorMsg.innerText = 'E-mail ou senha incorretos.';
-                    errorMsg.style.display = 'block';
-                }
-            } else {
-                // Fluxo de Cadastro
-                const existingUser = users.find(u => u.email === email);
-                if (existingUser) {
-                    errorMsg.innerText = 'Este e-mail já está cadastrado.';
-                    errorMsg.style.display = 'block';
-                } else {
-                    const name = document.getElementById('name').value.trim();
-                    users.push({ nome: name, email: email, password: password });
-                    localStorage.setItem('atelie_users', JSON.stringify(users));
-
-                    successMsg.style.display = 'block';
-                    document.getElementById('auth-form').reset();
-
-                    // Voltar para aba de login
-                    setTimeout(() => {
-                        toggleLink.click();
-                        successMsg.style.display = 'block'; // Manter a mensagem visível após a troca
-                    }, 500);
-                }
-            }
-        });
-    </script>
+    <script src="main.js"></script>
 </body>
 
 </html>
